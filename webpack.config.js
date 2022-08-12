@@ -6,7 +6,8 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   mode: 'production',
   entry: path.resolve(__dirname, 'node_modules/@js-native/core/instance.ts'),
-  target: 'web',
+  target: 'electron-renderer',
+  node: { global: true },
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({

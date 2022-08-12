@@ -23,6 +23,7 @@ const createMainWindow = () => {
     webPreferences: {
       devTools: is.development,
       nodeIntegration: true,
+      contextIsolation: false
     }
   });
   if (is.development) {

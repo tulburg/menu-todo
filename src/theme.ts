@@ -16,6 +16,8 @@ export default {
       '--grey-05': '#a0a0a0',
       '--grey-03': '#505050',
       '--grey-02': '#3f3f3f',
+      '--green-01': '#4DA958',
+      '--blue-01': '#1C62C8',
       '--white-01': '#FFFFFF',
     },
     // '@media(prefers-color-scheme: dark)': `
@@ -32,6 +34,8 @@ export default {
     grey05: 'var(--grey-05)',
     grey03: 'var(--grey-03)',
     grey02: 'var(--grey-02)',
+    green01: 'var(--green-01)',
+    blue01: 'var(--blue-01)',
     white01: 'var(--white-01)'
   }
 }
@@ -68,15 +72,18 @@ export class Task extends Container {
     super();
     this.time = new P().text(timeSince(new Date(task.created))).fontSize(11)
       .color(Theme.colors.grey05)
-    this.padding(16).display('grid').gridTemplateColumns('40px 1fr').gap(8)
+    this.padding(16).display('grid').gridTemplateColumns('40px 1fr 40px 32px').gap(8)
       .backgroundColor(Theme.colors.white01).borderBottom('1px solid ' + Theme.colors.grey08)
       .addChild(
-        new EM().addClassName('ic-play-circle').fontSize(40),
+        new EM().addClassName('ic-play-circle').fontSize(40).cursor('pointer'),
         new Container()
           .addChild(
             new P().text(task.body).fontSize(15).color(Theme.grey03),
             this.time.marginTop(8)
-          )
+          ),
+        new EM().addClassName('ic-checkmark-circle').fontSize(40).cursor('pointer').color(Theme.colors.green01)
+          .lineHeight('0.8'),
+        new EM().addClassName('ic-trash').fontSize(32).color('#c92400').cursor('pointer')
       )
       this.on({ created: () => {
         setInterval(() => this.time.text(timeSince(new Date(task.created))), 1000);

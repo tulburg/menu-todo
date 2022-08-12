@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'todo';
-  src:  url('fonts/todo.eot?bv7pc4');
-  src:  url('fonts/todo.eot?bv7pc4#iefix') format('embedded-opentype'),
-    url('fonts/todo.ttf?bv7pc4') format('truetype'),
-    url('fonts/todo.woff?bv7pc4') format('woff'),
-    url('fonts/todo.svg?bv7pc4#todo') format('svg');
+  src:  url('fonts/todo.eot?qzh3if');
+  src:  url('fonts/todo.eot?qzh3if#iefix') format('embedded-opentype'),
+    url('fonts/todo.ttf?qzh3if') format('truetype'),
+    url('fonts/todo.woff?qzh3if') format('woff'),
+    url('fonts/todo.svg?qzh3if#todo') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,6 +25,51 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ic-checkmark-circle:before {
+  content: "\e917";
+}
+.ic-checkmark-circle-fill:before {
+  content: "\e916";
+}
+.ic-checkmark-diamond-fill:before {
+  content: "\e914";
+}
+.ic-checkmark-diamond:before {
+  content: "\e915";
+}
+.ic-lock-fill:before {
+  content: "\e909";
+}
+.ic-gear:before {
+  content: "\e90a";
+}
+.ic-gear-shape-2:before {
+  content: "\e90b";
+}
+.ic-gear-shape-fill:before {
+  content: "\e90c";
+}
+.ic-gear-shape:before {
+  content: "\e90d";
+}
+.ic-highlighter:before {
+  content: "\e90e";
+}
+.ic-lock-open-fill:before {
+  content: "\e90f";
+}
+.ic-lock-open:before {
+  content: "\e910";
+}
+.ic-lock:before {
+  content: "\e911";
+}
+.ic-trash-fill:before {
+  content: "\e912";
+}
+.ic-trash:before {
+  content: "\e913";
+}
 .ic-pause-circle-fill:before {
   content: "\e900";
 }

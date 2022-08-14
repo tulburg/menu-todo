@@ -1,6 +1,7 @@
-import {Container, IMG, P, ObjectElement, Span, Embed, EM} from "@js-native/core/components";
+import {Container, P, EM, Button, H2} from "@js-native/core/components";
+import {RxElement} from "@js-native/core/types";
 import '../assets/font/style.css';
-import {SimpleTask} from "./app";
+import App, {SimpleTask} from "./app";
 
 export default {
   globals: {
@@ -17,6 +18,8 @@ export default {
       '--grey-03': '#505050',
       '--grey-02': '#3f3f3f',
       '--green-01': '#4DA958',
+      '--orange-01': '#FB9905',
+      '--red-01': '#c92400',
       '--blue-01': '#1C62C8',
       '--white-01': '#FFFFFF',
     },
@@ -35,6 +38,8 @@ export default {
     grey03: 'var(--grey-03)',
     grey02: 'var(--grey-02)',
     green01: 'var(--green-01)',
+    orange01: 'var(--orange-01)',
+    red01: 'var(--red-01)',
     blue01: 'var(--blue-01)',
     white01: 'var(--white-01)'
   }
@@ -57,7 +62,7 @@ const timeSince = (date: Date): string => {
   interval = Math.floor(seconds / 2592000);
   if (interval > 1) return interval + " months ago";
   interval = Math.floor(seconds / 86400);
-  if (interval >= 1) return interval === 1 ? 'Yesterday' : interval + " days ago";
+  if (interval >= 1) return interval === 1 ? interval + " day ago" : interval + " days ago";
   interval = Math.floor(seconds / 3600);
   if (interval >= 1) return interval === 1 ? interval + ' hour ago' : interval + " hours ago";
   interval = Math.floor(seconds / 60);
@@ -68,26 +73,157 @@ const timeSince = (date: Date): string => {
 
 export class Task extends Container {
   time: P;
-  constructor(task: SimpleTask) {
+  timer: H2;
+  timerContainer: Container;
+  timerInterval: any;
+  playButton: EM;
+  constructor(task: SimpleTask, root: App) {
     super();
     this.time = new P().text(timeSince(new Date(task.created))).fontSize(11)
-      .color(Theme.colors.grey05)
-    this.padding(16).display('grid').gridTemplateColumns('40px 1fr 40px 32px').gap(8)
-      .backgroundColor(Theme.colors.white01).borderBottom('1px solid ' + Theme.colors.grey08)
-      .addChild(
-        new EM().addClassName('ic-play-circle').fontSize(40).cursor('pointer'),
-        new Container()
-          .addChild(
-            new P().text(task.body).fontSize(15).color(Theme.grey03),
-            this.time.marginTop(8)
-          ),
-        new EM().addClassName('ic-checkmark-circle').fontSize(40).cursor('pointer').color(Theme.colors.green01)
-          .lineHeight('0.8'),
-        new EM().addClassName('ic-trash').fontSize(32).color('#c92400').cursor('pointer')
-      )
-      this.on({ created: () => {
-        setInterval(() => this.time.text(timeSince(new Date(task.created))), 1000);
-      } })
+      .color(Theme.colors.grey05);
+    this.timer = new H2().text('00:00:00').fontSize(32).color(Theme.colors.grey05).padding([16, 24]).textAlign('center'); 
+    this.timerContainer = new Container().overflow('hidden').height(0).transition('all .3s ease-out')
+      .addChild(this.timer);
+    const toDouble = (d: number) => ('0' + d.toString()).slice(-2);
+    this.playButton = new EM().addClassName(
+      task.status === 'active' ? 'ic-play-circle' : 
+        (task.status === 'playing' && task.pauseStart === undefined) ? 'ic-pause-circle' : 'ic-play-circle-fill'
+    ).fontSize(40)
+      .cursor('pointer').on({
+        click: () => {
+          if(task.status === 'active' || task.status === 'paused') {
+            this.playButton.removeClassName(task.status === 'active' ? 'ic-play-circle' : 'ic-play-circle-fill').addClassName('ic-pause-circle');
+            this.timerContainer.height(70);
+            if(task.pauseStart) {
+              task.playStart = Date.now() - (task.pauseStart - task.playStart);
+              task.pauseStart = undefined;
+            }
+            task.playStart = task.playStart || Date.now();
+            task.status = 'playing';
+            root.shuffleUp(this);
+            if(this.timerInterval) clearInterval(this.timerInterval);
+            this.timerInterval = setInterval(() => {
+              const date = new Date(Date.now() - new Date(task.playStart).getTime());
+              this.timer.text(toDouble(date.getHours() - 1) +':'+ toDouble(date.getMinutes()) + ':' + toDouble(date.getSeconds()))
+                .color(Theme.colors.orange01);
+              root.updateTaskTime(task);
+            }, 1000);
+          }else {
+            this.playButton.removeClassName('ic-pause-circle').addClassName('ic-play-circle-fill');
+            this.timerContainer.height(70);
+            task.status = 'paused';
+            this.timer.color(Theme.colors.grey05);
+            task.pauseStart = Date.now();
+            root.updateTaskTime(task);
+            clearInterval(this.timerInterval);
+          }
+        }
+      });
+    this.minWidth('100%').addChild(
+      this.timerContainer,
+      new Container().padding(16).display('grid').gridTemplateColumns('40px 1fr 40px 32px').gap(8)
+        .backgroundColor(Theme.colors.white01).borderBottom('1px solid ' + Theme.colors.grey08)
+        .addChild(
+          this.playButton,
+          new Container()
+            .addChild(
+              new P().text(task.body).fontSize(15).color(Theme.grey03),
+              this.time.marginTop(8)
+            ),
+          new EM().addClassName('ic-checkmark-circle').fontSize(40).cursor('pointer').color(Theme.colors.green01)
+            .lineHeight('0.8').on({
+              click: () => { root.completeTask(task) }
+            }),
+          new EM().addClassName('ic-trash').fontSize(32).color('#c92400').cursor('pointer').on({
+            click: () => {
+              root.confirmModal = new Modal(root, root.confirmModalTemplate, true);
+            } 
+          })
+        )
+    );
+    this.on({
+      created: () => {
+        setInterval(() => {
+          this.time.text(timeSince(new Date(task.created))); 
+        }, 1000);
+        const startTimer = () => {
+          if(this.timerInterval) clearInterval(this.timerInterval);
+          this.timerInterval = setInterval(() => {
+            const date = new Date(Date.now() - new Date(task.playStart).getTime());
+            this.timer.text(toDouble(date.getHours() - 1) +':'+ toDouble(date.getMinutes()) + ':' + toDouble(date.getSeconds()))
+              .color(Theme.colors.orange01);
+            root.updateTaskTime(task);
+          }, 1000);
+        }
+        if(task.status === 'playing' && task.pauseStart === undefined) {
+          this.timerContainer.height(70);
+          this.timer.color(Theme.colors.orange01);
+          startTimer();
+        }
+        if(task.status === 'paused') {
+          this.timerContainer.height(70);
+          const time = Date.now() - (task.pauseStart - task.playStart);
+          const date = new Date(Date.now() - new Date(time).getTime());
+          this.timer.text(toDouble(date.getHours() - 1) +':'+ toDouble(date.getMinutes()) + ':' + toDouble(date.getSeconds()))
+            .color(Theme.colors.grey05);
+        }
+      } 
+    })
   }
 }
 
+export class ClearButton extends Button {
+  constructor(text: string, action?: () => void) {
+    super();
+    this.backgroundColor('transparent').padding([12, 16]).borderRadius(4)
+      .fontSize(14).color(Theme.colors.grey03).text(text).border('0px')
+      .pseudo({
+        ':hover': { backgroundColor: Theme.colors.grey07 }
+      }).on({ click: action ? () => action() : () => {} })
+  }
+}
+
+export class Modal {
+
+  overlay: Container;
+  modal: Container;
+  root: RxElement;
+  showing = false;
+  onClose?: (confirm: boolean) => void;
+  
+  constructor(root: RxElement, modal: Container, outsideDimiss?: boolean) {
+    if(!root.node()) return;
+    const mainRoot = root.parent() === undefined;
+    this.overlay = new Container().backgroundColor('rgba(0,0,0,0.3)')
+      .size(['100%', '100%']).position(mainRoot ? 'fixed' : 'absolute').top(0).left(0)
+      .opacity('0').transition('all .3s ease-out').zIndex('10000');
+    const closeButton = new EM().addClassName('icon-plus').fontSize(32)
+        .color(Theme.colors.grey02).transform('rotate(-45deg)').position('absolute')
+        .display('inline-flex').alignItems('center').justifyContent('center')
+        .top(16).right(16).cursor('pointer').on({ click: () => this.close(false) })
+    modal.transition('all .3s ease-out').position(mainRoot ? 'fixed' : 'absolute').zIndex('10001');
+    if(outsideDimiss) this.overlay.on({ click: () => this.close(false) });
+    root.addChild(this.overlay);
+    root.addChild(modal);
+    modal.addChild(closeButton);
+    modal.top(modal.top() ? (<any>modal.top()) : 0).opacity('0.3');
+    setTimeout(() => {
+      this.overlay.opacity('1');
+      modal.top((<any>modal.top()) + 24).opacity('1.0');
+    }, 50); 
+    this.modal = modal;
+    this.root = root;
+    this.showing = true;
+  }
+
+  close = (confirm?: boolean) => {
+    this.overlay.opacity('0');
+    this.modal.top(this.modal.top() ? (<any>this.modal.top()) - 24 : 0).opacity('0.3');
+    setTimeout(() => {
+      this.root.removeChild(this.overlay);
+      this.root.removeChild(this.modal);
+      this.showing = false;
+      if(this.onClose) this.onClose(confirm);
+    }, 200)
+  }
+}

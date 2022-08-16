@@ -23,6 +23,9 @@ export default {
       '--blue-01': '#1C62C8',
       '--white-01': '#FFFFFF',
     },
+    html: {
+      backgroundColor: 'var(--white-01)'
+    },
     body: {
       overflowX: 'hidden'
     },
@@ -35,12 +38,17 @@ export default {
     'body::-webkit-scrollbar-thumb': {
       backgroundColor: 'rgba(100, 100, 100, 0.8)',
       border: 'transparent',
-    }
-    // '@media(prefers-color-scheme: dark)': `
-    //   :root {
-    //     --white-01: '#000000'
-    //   }
-    // `,
+    },
+    '@media(prefers-color-scheme: dark)': `
+      :root {
+        --white-01: #202020;
+        --grey-08: #303030;
+        --grey-09: #171717;
+        --grey-07: #505050;
+        --grey-03: #d0d0d0;
+        --grey-02: #f0f0f0;
+      }
+    `,
   },
   colors: {
     grey09: 'var(--grey-09)',
@@ -103,7 +111,7 @@ export class Task extends Container {
     this.playButton = new EM().addClassName(
       task.status === 'active' ? 'ic-play-circle' : 
         (task.status === 'playing' && task.pauseStart === undefined) ? 'ic-pause-circle' : 'ic-play-circle-fill'
-    ).fontSize(40)
+    ).fontSize(40).color(Theme.colors.grey02)
       .cursor('pointer').on({
         click: () => {
           if(task.status === 'completed') return;
@@ -135,14 +143,19 @@ export class Task extends Container {
           }
         }
       });
-    this.completeButton = new EM().addClassName('ic-checkmark-circle').fontSize(40).cursor('pointer').color(Theme.colors.green01)
+    this.completeButton = new EM().addClassName(task.status === 'completed' ? 'ic-checkmark-circle-fill' : 'ic-checkmark-circle').fontSize(40)
+      .cursor('pointer').color(Theme.colors.green01)
       .lineHeight('0.8').on({
         click: () => { 
           if(task.status !== 'completed') root.completeTask(task, this);
           else root.unCompleteTask(task, this);
         }
       });
-    this.body = new P().text(task.body).fontSize(15).color(Theme.grey03);
+    this.body = new P().text(task.body).fontSize(15).color(Theme.colors.grey03);
+    if(task.status === 'completed') {
+      this.body.textDecoration('line-through').opacity('0.4');
+      this.playButton.removeAllClassName().addClassName('ic-play-circle').opacity('0.3')
+    }
     this.minWidth(window.innerWidth).addChild(
       this.timerContainer,
       new Container().padding(16).display('grid').gridTemplateColumns('40px 1fr 40px 32px').gap(8)
@@ -158,6 +171,9 @@ export class Task extends Container {
           new EM().addClassName('ic-trash').fontSize(32).color('#c92400').cursor('pointer').on({
             click: () => {
               root.confirmModal = new Modal(root, root.confirmModalTemplate, true);
+              root.confirmModal.onClose = (confirm) => {
+                if(confirm) root.deleteTask(task, this);
+              }
             } 
           })
         )
@@ -214,7 +230,9 @@ export class Modal {
   
   constructor(root: RxElement, modal: Container, outsideDimiss?: boolean) {
     if(!root.node()) return;
-    const mainRoot = root.parent() === undefined;
+    this.modal = modal;
+    this.root = root;
+    const mainRoot = this.root.parent() === undefined;
     this.overlay = new Container().backgroundColor('rgba(0,0,0,0.3)')
       .size(['100%', '100%']).position(mainRoot ? 'fixed' : 'absolute').top(0).left(0)
       .opacity('0').transition('all .3s ease-out').zIndex('10000');
@@ -222,18 +240,16 @@ export class Modal {
         .color(Theme.colors.grey02).transform('rotate(-45deg)').position('absolute')
         .display('inline-flex').alignItems('center').justifyContent('center')
         .top(16).right(16).cursor('pointer').on({ click: () => this.close(false) })
-    modal.transition('all .3s ease-out').position(mainRoot ? 'fixed' : 'absolute').zIndex('10001');
+    this.modal.transition('all .3s ease-out').position(mainRoot ? 'fixed' : 'absolute').zIndex('10001');
     if(outsideDimiss) this.overlay.on({ click: () => this.close(false) });
-    root.addChild(this.overlay);
-    root.addChild(modal);
-    modal.addChild(closeButton);
-    modal.top(modal.top() ? (<any>modal.top()) : 0).opacity('0.3');
+    this.root.addChild(this.overlay);
+    this.root.addChild(this.modal); 
+    this.modal.addChild(closeButton);
+    this.modal.top(this.modal.top() ? (<any>this.modal.top()) : 0).opacity('0.3');
     setTimeout(() => {
       this.overlay.opacity('1');
-      modal.top((<any>modal.top()) + 24).opacity('1.0');
+      this.modal.top((<any>this.modal.top()) + 24).opacity('1.0');
     }, 50); 
-    this.modal = modal;
-    this.root = root;
     this.showing = true;
   }
 

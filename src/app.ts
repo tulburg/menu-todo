@@ -54,7 +54,8 @@ export default class App extends PageComponent {
       )
     this.taskHost = new Container().height('100%').width('calc(100% + 6px)').overflow('scroll').display('flex').flexDirection('column-reverse')
       .paddingRight(6);
-    this.completedHost = new Container().display('flex').flexDirection('column').position('relative').minWidth(window.innerWidth);
+    this.completedHost = new Container().display('flex').flexDirection('column').position('relative').minWidth(window.innerWidth)
+      .transition('all .3s ease-out');
     this.completedSeparator = new Container().backgroundColor(Theme.colors.white01).display('flex').justifyContent('center').position('relative')
       .transition('all .3s ease-out').top(-1).minWidth(window.innerWidth)
       .pseudo({
@@ -81,6 +82,12 @@ export default class App extends PageComponent {
           new Task(task, this).position('absolute').transition('all .3s ease-out').top(0)
         )
       });
+    (<SimpleTask[]>TaskStore.get('tasklist', []))
+      .filter(i => i.status === 'completed').forEach((task: SimpleTask) => {
+        this.completedHost.addChild(
+          new Task(task, this)
+        )
+      });
     this.updateTitle();
   }
 
@@ -103,15 +110,13 @@ export default class App extends PageComponent {
     const body = (<any>this.taskInput.node()).value, created = Date.now(), id = created.toString(32), status = 'active';
     this.taskInput.value('').height(42);
     const task = new Task({ id, body, created, status }, this);
-    task.on({ created: () => {
-      task.transition('all .3s ease-out').position('absolute').top(0);
-      this.onCreate();
-    } })
-    this.taskHost.addChild(task).position('absolute').transition('all .3s ease-out').top(0);
+    task.transition('all .3s ease-out').position('absolute').top(0);
+    this.taskHost.addChild(task);
     const tasklist = TaskStore.get('tasklist', []) as SimpleTask[];
     tasklist.push({ id, body, created, status });
     TaskStore.set('tasklist', tasklist);
     this.updateTitle();
+    this.onCreate();
   }
 
   completeTask(task: SimpleTask, taskElement: Task) {
@@ -124,16 +129,27 @@ export default class App extends PageComponent {
     taskElement.position('relative').top(0);
     this.completedHost.addChild(taskElement);
     taskElement.timerContainer.height(0);
-    taskElement.playButton.addClassName('ic-play-circle').opacity('0.3')
-    taskElement.playButton.removeClassName(task.status === 'playing' && task.pauseStart === undefined ? 'ic-pause-circle' : 'ic-play-circle-fill');
-    taskElement.completeButton.removeClassName('ic-checkmark-circle').addClassName('ic-checkmark-circle-fill')
-    taskElement.body.textDecoration('line-through')
+    taskElement.playButton.removeAllClassName().addClassName('ic-play-circle').opacity('0.3')
+    taskElement.completeButton.removeAllClassName().addClassName('ic-checkmark-circle-fill')
+    taskElement.body.textDecoration('line-through').opacity('0.4')
     task.status = 'completed';
-    this.updateTitle();
     TaskStore.set('tasklist', tasklist);
+    this.updateTitle();
   }
 
   unCompleteTask(task: SimpleTask, taskElement: Task) {
+  }
+
+  deleteTask(task: SimpleTask, taskElement: Task) {
+    let tasklist = TaskStore.get('tasklist', []) as SimpleTask[],
+      t = tasklist.find(i => i.id === task.id), index = tasklist.indexOf(t);
+    if(task.status === 'completed') this.completedHost.removeChild(taskElement);
+    else this.taskHost.removeChild(taskElement);
+    tasklist.splice(index, 1, undefined);
+    tasklist = tasklist.filter(i => i !== undefined);
+    TaskStore.set('tasklist', tasklist);
+    this.updateTitle();
+    this.onCreate();
   }
 
   updateTaskTime(task: SimpleTask) {

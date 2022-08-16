@@ -50,11 +50,15 @@ class TrayGenerator {
 
   createTray = () => {
     this.tray = new Tray(path.join(__dirname, 'assets/ic.png'));
-    this.tray.setIgnoreDoubleClickEvents(true);
+    this.tray.setIgnoreDoubleClickEvents(true); 
 
     this.tray.on('click', this.toggleWindow);
     this.tray.on('right-click', this.rightClickMenu);
   };
+
+  setTrayTitle = (title) => {
+    this.tray.setTitle(title)
+  }
 }
 
 module.exports = TrayGenerator;

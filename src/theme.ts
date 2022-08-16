@@ -23,6 +23,19 @@ export default {
       '--blue-01': '#1C62C8',
       '--white-01': '#FFFFFF',
     },
+    body: {
+      overflowX: 'hidden'
+    },
+    'body::-webkit-scrollbar': {
+      width: 6
+    },
+    'body::-webkit-scrollbar-track': {
+      backgroundColor: 'transparent'
+    },
+    'body::-webkit-scrollbar-thumb': {
+      backgroundColor: 'rgba(100, 100, 100, 0.8)',
+      border: 'transparent',
+    }
     // '@media(prefers-color-scheme: dark)': `
     //   :root {
     //     --white-01: '#000000'
@@ -77,6 +90,8 @@ export class Task extends Container {
   timerContainer: Container;
   timerInterval: any;
   playButton: EM;
+  completeButton: EM;
+  body: P;
   constructor(task: SimpleTask, root: App) {
     super();
     this.time = new P().text(timeSince(new Date(task.created))).fontSize(11)
@@ -91,6 +106,7 @@ export class Task extends Container {
     ).fontSize(40)
       .cursor('pointer').on({
         click: () => {
+          if(task.status === 'completed') return;
           if(task.status === 'active' || task.status === 'paused') {
             this.playButton.removeClassName(task.status === 'active' ? 'ic-play-circle' : 'ic-play-circle-fill').addClassName('ic-pause-circle');
             this.timerContainer.height(70);
@@ -119,7 +135,15 @@ export class Task extends Container {
           }
         }
       });
-    this.minWidth('100%').addChild(
+    this.completeButton = new EM().addClassName('ic-checkmark-circle').fontSize(40).cursor('pointer').color(Theme.colors.green01)
+      .lineHeight('0.8').on({
+        click: () => { 
+          if(task.status !== 'completed') root.completeTask(task, this);
+          else root.unCompleteTask(task, this);
+        }
+      });
+    this.body = new P().text(task.body).fontSize(15).color(Theme.grey03);
+    this.minWidth(window.innerWidth).addChild(
       this.timerContainer,
       new Container().padding(16).display('grid').gridTemplateColumns('40px 1fr 40px 32px').gap(8)
         .backgroundColor(Theme.colors.white01).borderBottom('1px solid ' + Theme.colors.grey08)
@@ -127,13 +151,10 @@ export class Task extends Container {
           this.playButton,
           new Container()
             .addChild(
-              new P().text(task.body).fontSize(15).color(Theme.grey03),
+              this.body,
               this.time.marginTop(8)
             ),
-          new EM().addClassName('ic-checkmark-circle').fontSize(40).cursor('pointer').color(Theme.colors.green01)
-            .lineHeight('0.8').on({
-              click: () => { root.completeTask(task) }
-            }),
+          this.completeButton,
           new EM().addClassName('ic-trash').fontSize(32).color('#c92400').cursor('pointer').on({
             click: () => {
               root.confirmModal = new Modal(root, root.confirmModalTemplate, true);

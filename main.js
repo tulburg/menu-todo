@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const { is } = require('electron-util');
 const path = require('path');
 const TrayGenerator = require('./tray-generator');
@@ -38,6 +38,10 @@ app.on('ready', () => {
   createMainWindow();
   const Tray = new TrayGenerator(mainWindow, store);
   Tray.createTray();
+
+  ipcMain.on('update-title', (_, data) => {
+    Tray.setTrayTitle(data);
+  })
 });
 
 app.setLoginItemSettings({

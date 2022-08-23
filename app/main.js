@@ -27,8 +27,8 @@ const createMainWindow = () => {
   });
   if (is.development) {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
-    mainWindow.loadURL('http://localhost:8080');
-    // mainWindow.loadURL(`file://${path.join(__dirname, '/public/index.html')}`);
+    // mainWindow.loadURL('http://localhost:8080');
+    mainWindow.loadURL(`file://${path.join(__dirname, '/public/index.html')}`);
   } else {
     mainWindow.webContents.openDevTools();
     mainWindow.loadURL(`file://${path.join(__dirname, '/public/index.html')}`);

@@ -12,7 +12,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      filename: path.resolve(__dirname, 'public/index.html'),
+      filename: path.resolve(__dirname, 'app/public/index.html'),
       template: path.resolve(__dirname, 'src/index.html'),
       inject: true
     }),
@@ -34,7 +34,7 @@ module.exports = {
     library: 'js-native',
     libraryTarget: 'umd',
     // publicPath: '/'
-    publicPath: 'public/'
+    publicPath: '../public/'
   },
   module: {
     rules: [

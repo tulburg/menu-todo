@@ -3,7 +3,7 @@
   "title": "Menu Todo",
   "version": "1.0.0",
   "description": "Todo on macOS menu bar",
-  "main": "app/main.js",
+  "main": "main.js",
   "keywords": [
     "menu",
     "bar",

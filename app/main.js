@@ -50,3 +50,4 @@ app.setLoginItemSettings({
 });
 
 // app.dock.hide();
+

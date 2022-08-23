@@ -62,3 +62,4 @@ class TrayGenerator {
 }
 
 module.exports = TrayGenerator;
+

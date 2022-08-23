@@ -17,7 +17,8 @@ module.exports = {
       inject: true
     }),
     new CopyPlugin([
-      { from: 'main.js', to: '../' }
+      { from: 'public', to: path.resolve(__dirname, 'public/') },
+      { from: 'assets', to: path.resolve(__dirname, 'app/assets/') }
     ])
   ],
   resolve: {
@@ -28,12 +29,12 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js', '.jsx']
   }, 
   output: {
-    path: path.resolve(__dirname, 'public'),
+    path: path.resolve(__dirname, 'app/public'),
     filename: 'app.js',
     library: 'js-native',
     libraryTarget: 'umd',
-    publicPath: '/'
-    // publicPath: '../public/'
+    // publicPath: '/'
+    publicPath: 'public/'
   },
   module: {
     rules: [

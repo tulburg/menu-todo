@@ -3,13 +3,14 @@
   "title": "Menu Todo",
   "version": "1.0.0",
   "description": "Todo on macOS menu bar",
-  "main": "main.js",
+  "main": "app/main.js",
   "scripts": {
     "start": "webpack serve --config webpack.config.js",
     "build": "tsc",
     "deploy": "webpack --config webpack.config.js && electron-builder -c electron-builder.env",
     "test": "npx jest"
   },
+  "postinstall": "electron-builder install-app-deps",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tulburg/menu-todo.git"
@@ -34,8 +35,6 @@
     "@types/webpack-env": "^1.17.0",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.7.1",
-    "electron-store": "^8.1.0",
-    "electron-util": "^0.17.2",
     "html-loader": "^4.1.0",
     "html-webpack-plugin": "^5.5.0",
     "path-browserify": "^1.0.1",
@@ -45,7 +44,9 @@
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.9.3",
-    "webpack-hot-middleware": "^2.25.1"
+    "webpack-hot-middleware": "^2.25.1",
+    "electron-store": "^8.1.0",
+    "electron-util": "^0.17.2"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^5.1.2",

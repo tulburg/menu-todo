@@ -1,0 +1,21 @@
+{
+  "name": "Menu-todo",
+  "title": "Menu Todo",
+  "version": "1.0.0",
+  "description": "Todo on macOS menu bar",
+  "main": "app/main.js",
+  "keywords": [
+    "menu",
+    "bar",
+    "todo"
+  ],
+  "author": "Tolu Oluwagbemi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tulburg/menu-todo/issues"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "electron-util": "^0.17.2"
+  } 
+}

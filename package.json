@@ -1,11 +1,13 @@
 {
-  "name": "menu-todo",
+  "name": "Menu-todo",
+  "title": "Menu Todo",
   "version": "1.0.0",
   "description": "Todo on macOS menu bar",
   "main": "main.js",
   "scripts": {
     "start": "webpack serve --config webpack.config.js",
     "build": "tsc",
+    "deploy": "webpack --config webpack.config.js && electron-builder -c electron-builder.env",
     "test": "npx jest"
   },
   "repository": {
@@ -32,7 +34,6 @@
     "@types/webpack-env": "^1.17.0",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.7.1",
-    "electron": "^17.4.7",
     "electron-store": "^8.1.0",
     "electron-util": "^0.17.2",
     "html-loader": "^4.1.0",
@@ -45,5 +46,10 @@
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.9.3",
     "webpack-hot-middleware": "^2.25.1"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^5.1.2",
+    "electron": "^17.4.7",
+    "electron-builder": "^23.3.3"
   }
 }

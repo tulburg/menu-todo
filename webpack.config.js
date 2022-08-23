@@ -2,6 +2,7 @@
 var path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'production',
@@ -11,10 +12,13 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      filename: path.resolve(__dirname, 'dist/index.html'),
+      filename: path.resolve(__dirname, 'public/index.html'),
       template: path.resolve(__dirname, 'src/index.html'),
       inject: true
-    }) 
+    }),
+    new CopyPlugin([
+      { from: 'main.js', to: '../' }
+    ])
   ],
   resolve: {
     alias: {
@@ -24,11 +28,12 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js', '.jsx']
   }, 
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'public'),
     filename: 'app.js',
     library: 'js-native',
     libraryTarget: 'umd',
     publicPath: '/'
+    // publicPath: '../public/'
   },
   module: {
     rules: [

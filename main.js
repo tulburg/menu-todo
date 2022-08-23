@@ -3,7 +3,6 @@ const { is } = require('electron-util');
 const path = require('path');
 const TrayGenerator = require('./tray-generator');
 
-
 let mainWindow = null;
 const Store = require('electron-store');
 const schema = {
@@ -29,8 +28,10 @@ const createMainWindow = () => {
   if (is.development) {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
     mainWindow.loadURL('http://localhost:8080');
+    // mainWindow.loadURL(`file://${path.join(__dirname, '/public/index.html')}`);
   } else {
-    mainWindow.loadURL(`file://${path.join(__dirname, '../../build/index.html')}`);
+    mainWindow.webContents.openDevTools();
+    mainWindow.loadURL(`file://${path.join(__dirname, '/public/index.html')}`);
   }
 };
 

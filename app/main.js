@@ -49,5 +49,5 @@ app.setLoginItemSettings({
   openAtLogin: store.get('launchAtStart'),
 });
 
-// app.dock.hide();
+app.dock.hide();
 

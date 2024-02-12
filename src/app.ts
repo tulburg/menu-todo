@@ -1,8 +1,7 @@
-import { Container, H4, HR, PageComponent, Span, TextArea } from '@js-native/core/components';
-import {RxElement} from '@js-native/core/types';
-import {ipcRenderer} from 'electron';
+import { ELEMENT, Container, H4, PageComponent, Span, Textarea } from '@javascriptui/core';
+import { ipcRenderer } from 'electron';
 import * as Store from 'electron-store';
-import {ClearButton, Modal, Task} from './theme';
+import { ClearButton, Modal, Task } from './theme';
 export const TaskStore = new Store();
 export interface SimpleTask {
   id: string,
@@ -14,7 +13,7 @@ export interface SimpleTask {
 }
 export default class App extends PageComponent {
 
-  taskInput: TextArea;
+  taskInput: Textarea;
   taskHost: Container;
   completedHost: Container;
   confirmModalTemplate: Container;
@@ -25,21 +24,22 @@ export default class App extends PageComponent {
     super();
     let lastHeight = 0;
     const self = this;
-    this.taskInput = new TextArea().type('text').width('100%').padding([12, 16]).height(42).border('1px solid ' + Theme.colors.grey08)
+    this.taskInput = new Textarea().attrType('text').width('100%').padding([12, 16]).height(42).border('1px solid ' + Theme.colors.grey08)
       .backgroundColor(Theme.colors.white01).color(Theme.colors.grey02).fontSize(15).borderRadius(4).fontWeight('500').resize('inherit')
-      .placeholder('Start a todo...')
-      .on({ 
-        input: function() { 
+      .attrPlaceholder('Start a todo...')
+      .on({
+        input: function () {
+          this.height('auto');
           this.height(this.node().scrollHeight);
-          if(this.node().scrollHeight !== lastHeight) self.onCreate();
+          if (this.node().scrollHeight !== lastHeight) self.onCreate();
           lastHeight = this.node().scrollHeight;
-        }, 
+        },
         keyup: (e: KeyboardEvent) => { e.preventDefault(); e.code === 'Enter' ? this.createTask() : '' },
-        blur: function() { if((<any>this.node()).value === '') this.height(42) }
+        blur: function () { if ((<any>this.node()).value === '') this.height(42) }
       });
     this.taskInputContainer = new Container().backgroundColor(Theme.colors.grey09).borderBottom('1px solid ' + Theme.colors.grey07).padding(16)
       .position('fixed').width('100%').zIndex('10')
-      .addChild(this.taskInput )
+      .addChild(this.taskInput)
     this.confirmModalTemplate = new Container().display('flex').flexDirection('column')
       .backgroundColor(Theme.colors.white01).borderRadius(12).padding(24).alignItems('center')
       .left('50%').top(100).transform('translateX(-50%)').width(296)
@@ -59,14 +59,14 @@ export default class App extends PageComponent {
     this.completedSeparator = new Container().backgroundColor(Theme.colors.white01).display('flex').justifyContent('center').position('relative')
       .transition('all .3s ease-out').top(-1).minWidth(window.innerWidth)
       .pseudo({
-        ':before': { 
+        ':before': {
           content: "''", position: 'absolute', width: 'calc(100vw)', top: 'calc(50% - 1px)', height: '2px', backgroundColor: Theme.colors.grey07,
           left: 0
         }
       }).addChild(
         new Span().text('COMPLETED').fontWeight('bold').color(Theme.colors.grey06).backgroundColor(Theme.colors.white01)
           .fontSize(11).position('relative').padding(8)
-      ); 
+      );
     this.addChild(
       this.taskInputContainer,
       this.taskHost,
@@ -75,7 +75,7 @@ export default class App extends PageComponent {
     );
     (<SimpleTask[]>TaskStore.get('tasklist', []))
       .filter(i => i.status === 'active' || i.status === 'playing' || i.status === 'paused')
-      .sort((a,b) => {
+      .sort((a, b) => {
         return a.status === 'playing' && b.status !== 'playing' ? 1 : a.status === 'active' && b.status !== 'active' ? -1 : 0;
       }).forEach((task: SimpleTask) => {
         this.taskHost.addChild(
@@ -94,11 +94,11 @@ export default class App extends PageComponent {
   onCreate() {
     setTimeout(() => {
       let top = (<any>this.taskInputContainer.node()).offsetHeight;
-      Array.from(this.taskHost.children()).reverse().forEach((child: RxElement, index) => {
-        if(!child) return;
+      Array.from(this.taskHost.children()).reverse().forEach((child: ELEMENT, index) => {
+        if (!child) return;
         child.top(top);
         top = top + (<any>child.node()).offsetHeight;
-        if(index === this.taskHost.children().length - 1) {
+        if (index === this.taskHost.children().length - 1) {
           this.taskHost.height(top);
         }
       });
@@ -108,7 +108,7 @@ export default class App extends PageComponent {
 
   createTask() {
     const body = (<any>this.taskInput.node()).value, created = Date.now(), id = created.toString(32), status = 'active';
-    this.taskInput.value('').height(42);
+    this.taskInput.attrValue('').height(42);
     const task = new Task({ id, body, created, status }, this);
     task.transition('all .3s ease-out').position('absolute').top(0);
     this.taskHost.addChild(task);
@@ -138,12 +138,13 @@ export default class App extends PageComponent {
   }
 
   unCompleteTask(task: SimpleTask, taskElement: Task) {
+    console.log(task, taskElement);
   }
 
   deleteTask(task: SimpleTask, taskElement: Task) {
     let tasklist = TaskStore.get('tasklist', []) as SimpleTask[],
       t = tasklist.find(i => i.id === task.id), index = tasklist.indexOf(t);
-    if(task.status === 'completed') this.completedHost.removeChild(taskElement);
+    if (task.status === 'completed') this.completedHost.removeChild(taskElement);
     else this.taskHost.removeChild(taskElement);
     tasklist.splice(index, 1, undefined);
     tasklist = tasklist.filter(i => i !== undefined);
@@ -164,17 +165,17 @@ export default class App extends PageComponent {
   shuffleUp(task: Container) {
     const children: Container[] = Array.from(this.taskHost.children()).reverse() as any, index = children.indexOf(task);
     const height = (<any>task.node()).offsetHeight;
-    for(let i = 0; i < index; i++) {
-      if(children[i]) children[i].top(children[i].top() + height);
+    for (let i = 0; i < index; i++) {
+      if (children[i]) children[i].top(children[i].top() + height);
     }
     task.top(78);
-    window.scrollTo({top: 0, behavior: 'smooth'});
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.taskHost.children().sort((a, b) => {
-      if(this.taskHost.children().indexOf(a) === this.taskHost.children().indexOf(task)){
+      if (this.taskHost.children().indexOf(a) === this.taskHost.children().indexOf(task)) {
         return 1;
-      }else if(this.taskHost.children().indexOf(b) === this.taskHost.children().indexOf(task)) {
+      } else if (this.taskHost.children().indexOf(b) === this.taskHost.children().indexOf(task)) {
         return -1;
-      }else return 0
+      } else return 0
     });
   }
 

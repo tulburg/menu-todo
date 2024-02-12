@@ -1,7 +1,6 @@
-import {Container, P, EM, Button, H2} from "@js-native/core/components";
-import {RxElement} from "@js-native/core/types";
+import { ELEMENT, Container, P, EM, Button, H2 } from "@javascriptui/core";
 import '../assets/font/style.css';
-import App, {SimpleTask} from "./app";
+import App, { SimpleTask } from "./app";
 
 export default {
   globals: {
@@ -78,7 +77,7 @@ export const Ics = {
 
 const timeSince = (date: Date): string => {
   var seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000),
-  interval = Math.floor(seconds / 31536000);
+    interval = Math.floor(seconds / 31536000);
   if (interval > 1) return interval + " years ago";
   interval = Math.floor(seconds / 2592000);
   if (interval > 1) return interval + " months ago";
@@ -89,7 +88,7 @@ const timeSince = (date: Date): string => {
   interval = Math.floor(seconds / 60);
   if (interval >= 1) return interval === 1 ? interval + ' minute ago' : interval + " minutes ago";
   // return Math.floor(seconds) + ' seconds ago';
-  return 'Just now'; 
+  return 'Just now';
 }
 
 export class Task extends Container {
@@ -104,35 +103,35 @@ export class Task extends Container {
     super();
     this.time = new P().text(timeSince(new Date(task.created))).fontSize(11)
       .color(Theme.colors.grey05);
-    this.timer = new H2().text('00:00:00').fontSize(32).color(Theme.colors.grey05).padding([16, 24]).textAlign('center'); 
+    this.timer = new H2().text('00:00:00').fontSize(32).color(Theme.colors.grey05).padding([16, 24]).textAlign('center');
     this.timerContainer = new Container().overflow('hidden').height(0).transition('all .3s ease-out')
       .addChild(this.timer);
     const toDouble = (d: number) => ('0' + d.toString()).slice(-2);
     this.playButton = new EM().addClassName(
-      task.status === 'active' ? 'ic-play-circle' : 
+      task.status === 'active' ? 'ic-play-circle' :
         (task.status === 'playing' && task.pauseStart === undefined) ? 'ic-pause-circle' : 'ic-play-circle-fill'
     ).fontSize(40).color(Theme.colors.grey02)
       .cursor('pointer').on({
         click: () => {
-          if(task.status === 'completed') return;
-          if(task.status === 'active' || task.status === 'paused') {
+          if (task.status === 'completed') return;
+          if (task.status === 'active' || task.status === 'paused') {
             this.playButton.removeClassName(task.status === 'active' ? 'ic-play-circle' : 'ic-play-circle-fill').addClassName('ic-pause-circle');
             this.timerContainer.height(70);
-            if(task.pauseStart) {
+            if (task.pauseStart) {
               task.playStart = Date.now() - (task.pauseStart - task.playStart);
               task.pauseStart = undefined;
             }
             task.playStart = task.playStart || Date.now();
             task.status = 'playing';
             root.shuffleUp(this);
-            if(this.timerInterval) clearInterval(this.timerInterval);
+            if (this.timerInterval) clearInterval(this.timerInterval);
             this.timerInterval = setInterval(() => {
               const date = new Date(Date.now() - new Date(task.playStart).getTime());
-              this.timer.text(toDouble(date.getHours() - 1) +':'+ toDouble(date.getMinutes()) + ':' + toDouble(date.getSeconds()))
+              this.timer.text(toDouble(date.getHours() - 1) + ':' + toDouble(date.getMinutes()) + ':' + toDouble(date.getSeconds()))
                 .color(Theme.colors.orange01);
               root.updateTaskTime(task);
             }, 1000);
-          }else {
+          } else {
             this.playButton.removeClassName('ic-pause-circle').addClassName('ic-play-circle-fill');
             this.timerContainer.height(70);
             task.status = 'paused';
@@ -146,13 +145,13 @@ export class Task extends Container {
     this.completeButton = new EM().addClassName(task.status === 'completed' ? 'ic-checkmark-circle-fill' : 'ic-checkmark-circle').fontSize(40)
       .cursor('pointer').color(Theme.colors.green01)
       .lineHeight('0.8').on({
-        click: () => { 
-          if(task.status !== 'completed') root.completeTask(task, this);
+        click: () => {
+          if (task.status !== 'completed') root.completeTask(task, this);
           else root.unCompleteTask(task, this);
         }
       });
     this.body = new P().text(task.body).fontSize(15).color(Theme.colors.grey03);
-    if(task.status === 'completed') {
+    if (task.status === 'completed') {
       this.body.textDecoration('line-through').opacity('0.4');
       this.playButton.removeAllClassName().addClassName('ic-play-circle').opacity('0.3')
     }
@@ -172,39 +171,39 @@ export class Task extends Container {
             click: () => {
               root.confirmModal = new Modal(root, root.confirmModalTemplate, true);
               root.confirmModal.onClose = (confirm) => {
-                if(confirm) root.deleteTask(task, this);
+                if (confirm) root.deleteTask(task, this);
               }
-            } 
+            }
           })
         )
     );
     this.on({
       created: () => {
         setInterval(() => {
-          this.time.text(timeSince(new Date(task.created))); 
+          this.time.text(timeSince(new Date(task.created)));
         }, 1000);
         const startTimer = () => {
-          if(this.timerInterval) clearInterval(this.timerInterval);
+          if (this.timerInterval) clearInterval(this.timerInterval);
           this.timerInterval = setInterval(() => {
             const date = new Date(Date.now() - new Date(task.playStart).getTime());
-            this.timer.text(toDouble(date.getHours() - 1) +':'+ toDouble(date.getMinutes()) + ':' + toDouble(date.getSeconds()))
+            this.timer.text(toDouble(date.getHours() - 1) + ':' + toDouble(date.getMinutes()) + ':' + toDouble(date.getSeconds()))
               .color(Theme.colors.orange01);
             root.updateTaskTime(task);
           }, 1000);
         }
-        if(task.status === 'playing' && task.pauseStart === undefined) {
+        if (task.status === 'playing' && task.pauseStart === undefined) {
           this.timerContainer.height(70);
           this.timer.color(Theme.colors.orange01);
           startTimer();
         }
-        if(task.status === 'paused') {
+        if (task.status === 'paused') {
           this.timerContainer.height(70);
           const time = Date.now() - (task.pauseStart - task.playStart);
           const date = new Date(Date.now() - new Date(time).getTime());
-          this.timer.text(toDouble(date.getHours() - 1) +':'+ toDouble(date.getMinutes()) + ':' + toDouble(date.getSeconds()))
+          this.timer.text(toDouble(date.getHours() - 1) + ':' + toDouble(date.getMinutes()) + ':' + toDouble(date.getSeconds()))
             .color(Theme.colors.grey05);
         }
-      } 
+      }
     })
   }
 }
@@ -224,32 +223,32 @@ export class Modal {
 
   overlay: Container;
   modal: Container;
-  root: RxElement;
+  root: ELEMENT;
   showing = false;
   onClose?: (confirm: boolean) => void;
-  
-  constructor(root: RxElement, modal: Container, outsideDimiss?: boolean) {
-    if(!root.node()) return;
+
+  constructor(root: ELEMENT, modal: Container, outsideDimiss?: boolean) {
+    if (!root.node()) return;
     this.modal = modal;
     this.root = root;
     const mainRoot = this.root.parent() === undefined;
     this.overlay = new Container().backgroundColor('rgba(0,0,0,0.3)')
-      .size(['100%', '100%']).position(mainRoot ? 'fixed' : 'absolute').top(0).left(0)
+      .width('100%').height('100%').position(mainRoot ? 'fixed' : 'absolute').top(0).left(0)
       .opacity('0').transition('all .3s ease-out').zIndex('10000');
     const closeButton = new EM().addClassName('icon-plus').fontSize(32)
-        .color(Theme.colors.grey02).transform('rotate(-45deg)').position('absolute')
-        .display('inline-flex').alignItems('center').justifyContent('center')
-        .top(16).right(16).cursor('pointer').on({ click: () => this.close(false) })
+      .color(Theme.colors.grey02).transform('rotate(-45deg)').position('absolute')
+      .display('inline-flex').alignItems('center').justifyContent('center')
+      .top(16).right(16).cursor('pointer').on({ click: () => this.close(false) })
     this.modal.transition('all .3s ease-out').position(mainRoot ? 'fixed' : 'absolute').zIndex('10001');
-    if(outsideDimiss) this.overlay.on({ click: () => this.close(false) });
+    if (outsideDimiss) this.overlay.on({ click: () => this.close(false) });
     this.root.addChild(this.overlay);
-    this.root.addChild(this.modal); 
+    this.root.addChild(this.modal);
     this.modal.addChild(closeButton);
     this.modal.top(this.modal.top() ? (<any>this.modal.top()) : 0).opacity('0.3');
     setTimeout(() => {
       this.overlay.opacity('1');
       this.modal.top((<any>this.modal.top()) + 24).opacity('1.0');
-    }, 50); 
+    }, 50);
     this.showing = true;
   }
 
@@ -260,7 +259,7 @@ export class Modal {
       this.root.removeChild(this.overlay);
       this.root.removeChild(this.modal);
       this.showing = false;
-      if(this.onClose) this.onClose(confirm);
+      if (this.onClose) this.onClose(confirm);
     }, 200)
   }
 }

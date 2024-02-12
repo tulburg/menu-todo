@@ -1,5 +1,5 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const { is } = require('electron-util');
+const {app, BrowserWindow, ipcMain} = require('electron');
+const {is} = require('electron-util');
 const path = require('path');
 const TrayGenerator = require('./tray-generator');
 
@@ -25,8 +25,13 @@ const createMainWindow = () => {
       contextIsolation: false
     }
   });
+
+  mainWindow.on('blur', () => {
+    mainWindow.hide();
+    app.dock.hide();
+  });
   if (is.development) {
-    mainWindow.webContents.openDevTools({ mode: 'detach' });
+    mainWindow.webContents.openDevTools({mode: 'detach'});
     // mainWindow.loadURL('http://localhost:8080');
     mainWindow.loadURL(`file://${path.join(__dirname, '/public/index.html')}`);
   } else {

@@ -3,5 +3,4 @@ dist/**
 public/**
 *.DS_Store
 app/public/**
-app/assets/**
 app/node_modules/**

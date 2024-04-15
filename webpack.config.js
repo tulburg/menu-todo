@@ -1,9 +1,10 @@
 /* eslint-disable */
 var path = require('path')
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-var WriteFilePlugin = require('write-file-webpack-plugin');
 
 module.exports = {
+  mode: 'production',
   entry: path.resolve(__dirname, 'node_modules/@javascriptui/core/dist/instance'),
   target: 'electron-renderer',
   node: {global: true},
@@ -11,23 +12,22 @@ module.exports = {
     historyApiFallback: true
   },
   plugins: [
-    new WriteFilePlugin(),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      filename: path.resolve(__dirname, 'dist/index.html'),
+      filename: path.resolve(__dirname, 'app/public/index.html'),
       template: path.resolve(__dirname, 'src/index.html'),
-      inject: true
-    })
+    }),
   ],
   resolve: {
     alias: {
-      '@src': path.resolve(__dirname, 'src')
+      '@src': path.resolve(__dirname, 'src'),
     },
     extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'app/public'),
     filename: 'app.js',
-    library: 'javascriptui',
+    library: 'js-native',
     libraryTarget: 'umd',
     publicPath: '/'
   },
@@ -41,5 +41,3 @@ module.exports = {
     ]
   }
 };
-
-

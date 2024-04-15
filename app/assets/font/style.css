@@ -1,0 +1,99 @@
+@font-face {
+  font-family: 'todo';
+  src:  url('fonts/todo.eot?qzh3if');
+  src:  url('fonts/todo.eot?qzh3if#iefix') format('embedded-opentype'),
+    url('fonts/todo.ttf?qzh3if') format('truetype'),
+    url('fonts/todo.woff?qzh3if') format('woff'),
+    url('fonts/todo.svg?qzh3if#todo') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="ic-"], [class*=" ic-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'todo' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ic-checkmark-circle:before {
+  content: "\e917";
+}
+.ic-checkmark-circle-fill:before {
+  content: "\e916";
+}
+.ic-checkmark-diamond-fill:before {
+  content: "\e914";
+}
+.ic-checkmark-diamond:before {
+  content: "\e915";
+}
+.ic-lock-fill:before {
+  content: "\e909";
+}
+.ic-gear:before {
+  content: "\e90a";
+}
+.ic-gear-shape-2:before {
+  content: "\e90b";
+}
+.ic-gear-shape-fill:before {
+  content: "\e90c";
+}
+.ic-gear-shape:before {
+  content: "\e90d";
+}
+.ic-highlighter:before {
+  content: "\e90e";
+}
+.ic-lock-open-fill:before {
+  content: "\e90f";
+}
+.ic-lock-open:before {
+  content: "\e910";
+}
+.ic-lock:before {
+  content: "\e911";
+}
+.ic-trash-fill:before {
+  content: "\e912";
+}
+.ic-trash:before {
+  content: "\e913";
+}
+.ic-pause-circle-fill:before {
+  content: "\e900";
+}
+.ic-pause-circle:before {
+  content: "\e901";
+}
+.ic-pause-fill:before {
+  content: "\e902";
+}
+.ic-play-circle-fill:before {
+  content: "\e903";
+}
+.ic-play-circle:before {
+  content: "\e904";
+}
+.ic-play-fill:before {
+  content: "\e905";
+}
+.ic-stop-circle-fill:before {
+  content: "\e906";
+}
+.ic-stop-circle:before {
+  content: "\e907";
+}
+.ic-stop-fill:before {
+  content: "\e908";
+}

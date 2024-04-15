@@ -150,7 +150,7 @@ export class Task extends Container {
           else root.unCompleteTask(task, this);
         }
       });
-    this.body = new P().text(task.body).fontSize(15).color(Theme.colors.grey03);
+    this.body = new P().text(task.body).fontSize(15).color(Theme.colors.grey03).wordBreak("break-word");
     if (task.status === 'completed') {
       this.body.textDecoration('line-through').opacity('0.4');
       this.playButton.removeAllClassName().addClassName('ic-play-circle').opacity('0.3')

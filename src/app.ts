@@ -91,7 +91,7 @@ export default class App extends PageComponent {
     this.updateTitle();
   }
 
-  onCreate() {
+  orderTasks() {
     setTimeout(() => {
       let top = (<any>this.taskInputContainer.node()).offsetHeight;
       Array.from(this.taskHost.children()).reverse().forEach((child: ELEMENT, index) => {
@@ -103,6 +103,10 @@ export default class App extends PageComponent {
         }
       });
     }, 100);
+  }
+
+  onCreate() {
+    this.orderTasks();
     this.updateTitle();
   }
 
@@ -177,6 +181,7 @@ export default class App extends PageComponent {
         return -1;
       } else return 0
     });
+    this.orderTasks();
   }
 
   updateTitle() {

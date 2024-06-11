@@ -5,9 +5,9 @@
   "description": "Todo on macOS menu bar",
   "main": "app/main.js",
   "scripts": {
-    "start": "webpack serve --config webpack.config.js & electron .",
+    "start": "mode=development webpack serve --config webpack.config.js & electron .",
     "build": "tsc",
-    "deploy": "webpack --config webpack.config.js --mode production && electron-builder build --publish never -c electron-builder.env",
+    "deploy": "mode=production webpack --config webpack.config.js --mode production && electron-builder build --publish never -c electron-builder.env",
     "test": "npx jest"
   },
   "postinstall": "electron-builder install-app-deps",
@@ -30,7 +30,7 @@
     "@javascriptui/core": "^0.0.6",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.7.1",
-    "electron": "^21.2.0",
+    "electron": "^21.4.4",
     "electron-store": "^8.1.0",
     "electron-util": "^0.17.2",
     "html-loader": "^4.1.0",
